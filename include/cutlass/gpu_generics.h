@@ -402,8 +402,10 @@ namespace cutlass {
     cudaError_t cudaDeviceGetAttribute(int *value, cudaDeviceAttr attr, int device) {
       return cudaSuccess;
     }
-
-    constexpr unsigned int cudaOccupancyDisableCachingOverride = 0;
+    
+    #if !defined(SYCL_NVIDIA_TARGET)
+      constexpr unsigned int cudaOccupancyDisableCachingOverride = 0;
+    #endif
 
     CUTLASS_HOST
     cudaError_t cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(

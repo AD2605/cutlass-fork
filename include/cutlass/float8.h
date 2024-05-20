@@ -532,7 +532,11 @@ struct alignas(1) float_e4m3_t : float8_base<FloatEncoding::E4M3> {
     CUTLASS_HOST_DEVICE
     explicit operator int() const {
     #if defined(__CUDA_ARCH__)
+      #if defined(CUTLASS_ENABLE_SYCL)
+        return  int(to_half(*this));
+      #else
         return __half2int_rn(to_half(*this));
+      #endif
     #else
         return int(to_float(*this));
     #endif
@@ -542,7 +546,11 @@ struct alignas(1) float_e4m3_t : float8_base<FloatEncoding::E4M3> {
     CUTLASS_HOST_DEVICE
     explicit operator bool() const {
     #if defined(__CUDA_ARCH__)
-        return bool(__half2int_rn(to_half(*this)));
+      #if defined(CUTLASS_ENABLE_SYCL)
+        return  int(to_half(*this));
+      #else
+        return __half2int_rn(to_half(*this));
+      #endif
     #else
         return bool(int(to_float(*this)));
     #endif
@@ -741,7 +749,11 @@ struct alignas(1) float_e5m2_t : float8_base<FloatEncoding::E5M2> {
     CUTLASS_HOST_DEVICE
     explicit operator int() const {
     #if defined(__CUDA_ARCH__)
+      #if defined(CUTLASS_ENABLE_SYCL)
+        return  int(to_half(*this));
+      #else
         return __half2int_rn(to_half(*this));
+      #endif
     #else
         return int(to_float(*this));
     #endif
@@ -751,7 +763,11 @@ struct alignas(1) float_e5m2_t : float8_base<FloatEncoding::E5M2> {
     CUTLASS_HOST_DEVICE
     explicit operator bool() const {
     #if defined(__CUDA_ARCH__)
-        return bool(__half2int_rn(to_half(*this)));
+      #if defined(CUTLASS_ENABLE_SYCL)
+        return  int(to_half(*this));
+      #else
+        return __half2int_rn(to_half(*this));
+      #endif
     #else
         return bool(int(to_float(*this)));
     #endif
