@@ -216,7 +216,7 @@ __half2 __hfma2(__half2 a, __half2 b, __half2 c) {
 
 __half __uint2half_rn(const unsigned& n) {
       return __half(n);
-}
+} 
 
 #endif
 }
