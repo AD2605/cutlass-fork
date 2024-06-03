@@ -225,7 +225,7 @@ public:
     using X = Underscore;
 
 // Any Tensor Op MMA Atom in the WGMMA ISA is arch conditional to sm90a.
-#if ! defined(__CUDA_ARCH_FEAT_SM90_ALL)
+#if ! defined(__CUDA_ARCH_FEAT_SM90_ALL) || !(CUTLASS_ENABLE_SYCL)
     printf("ERROR : Arch conditional MMA instruction used without targeting sm90a compute capability. Aborting.\n");
 #else
 
