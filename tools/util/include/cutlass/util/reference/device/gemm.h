@@ -45,6 +45,9 @@
 
 #include "cutlass/util/reference/device/kernel/gemm.h"
 
+#if defined(CUTLASS_ENABLE_SYCL)
+#include <syclcompat.hpp>
+#endif
 namespace cutlass {
 namespace reference {
 namespace device {
@@ -90,6 +93,34 @@ void compute_gemm(
   //
   // Note, this reference implementation is NOT expected to approach peak performance.
   using OutputTile = MatrixShape<4, 4>;
+#if defined(CUTLASS_ENABLE_SYCL)
+
+  syclcompat::dim3 block(16, 8);
+
+  syclcompat::dim3 grid(
+    (problem_size.m() + block.x * OutputTile::kRow - 1) / (block.x * OutputTile::kRow),
+    (problem_size.n() + block.y * OutputTile::kColumn - 1) / (block.y * OutputTile::kColumn)
+  );
+
+  syclcompat::launch<kernel::Gemm<
+    TensorRef<ElementA, LayoutA>,
+    TensorRef<ElementB, LayoutB>,
+    TensorRef<ElementC, LayoutC>,
+    ScalarType,
+    AccumulatorType,
+    OutputTile,
+    InnerProductOp,
+    ConvertOp
+  >>(    problem_size,
+    alpha,
+    tensor_a,
+    tensor_b,
+    beta,
+    tensor_c,
+    tensor_d,
+    initial_accum);
+
+#else
 
   dim3 block(16, 8);
 
@@ -118,6 +149,8 @@ void compute_gemm(
     tensor_d,
     initial_accum
   );
+
+#endif
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -326,6 +359,34 @@ void BatchedGemm(
   // Note, this reference implementation is NOT expected to approach peak performance.
   using OutputTile = MatrixShape<4, 4>;
 
+  // Launch a GEMM kernel
+  #if defined(CUTLASS_ENABLE_SYCL)
+  
+  syclcompat::dim3 block(16, 8);
+  syclcompat::dim3 grid(
+    (problem_size.m() + block.x * OutputTile::kRow - 1) / (block.x * OutputTile::kRow),
+    (problem_size.n() + block.y * OutputTile::kColumn - 1) / (block.y * OutputTile::kColumn),
+    batch_count
+  );
+
+  syclcompat::launch<  kernel::BatchedGemm<
+    TensorRefCollectionA,
+    TensorRefCollectionB,
+    TensorRefCollectionC,
+    ScalarType,
+    AccumulatorType,
+    OutputTile,
+    InnerProductOp,
+    ConvertOp
+  >>(grid, block,     problem_size,
+    alpha,
+    tensor_a,
+    tensor_b,
+    beta,
+    tensor_c,
+    initial_accum);
+  #else
+
   dim3 block(16, 8);
   dim3 grid(
     (problem_size.m() + block.x * OutputTile::kRow - 1) / (block.x * OutputTile::kRow),
@@ -333,7 +394,6 @@ void BatchedGemm(
     batch_count
   );
 
-  // Launch a GEMM kernel
   kernel::BatchedGemm<
     TensorRefCollectionA,
     TensorRefCollectionB,
@@ -352,6 +412,7 @@ void BatchedGemm(
     tensor_c,
     initial_accum
   );
+  #endif
 }
 
 /// Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef

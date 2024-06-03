@@ -96,6 +96,7 @@ if (CUTLASS_ENABLE_SYCL)
 
   foreach(EXAMPLE
     14_ampere_tf32_tensorop_gemm
+    48_hopper_warp_specialized_gemm
     cute
     sycl
   )

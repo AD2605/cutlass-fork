@@ -375,8 +375,18 @@ public:
         CUTLASS_ASSERT(cuda_adapter == nullptr);
         void const* kernel = (void const*) device_kernel<GemmKernel>;
         if constexpr (GemmKernel::ArchTag::kMinComputeCapability == 90) {
-          launch_result = ClusterLauncher::launch(
-            grid, cluster, block, smem_size, stream, kernel, kernel_params);
+          #if defined(CUTLASS_ENABLE_SYCL)
+            sycl::ext::oneapi::experimental::properties cluster_launch_property
+              {sycl::ext::oneapi::experimental::cluster_size(sycl::range<3>(cluster.z, cluster.y, cluster.x))};
+            
+            syclcompat::experimental::launch<device_kernel<GemmKernel>>(
+              syclcompat::dim3(grid.x, grid.y, grid.z), syclcompat::dim3(block.x, block.y, block.z),
+              smem_size, cluster_launch_property, kernel_params
+            );
+          #else
+            launch_result = ClusterLauncher::launch(
+              grid, cluster, block, smem_size, stream, kernel, kernel_params);
+          #endif
         }
       }
     }
