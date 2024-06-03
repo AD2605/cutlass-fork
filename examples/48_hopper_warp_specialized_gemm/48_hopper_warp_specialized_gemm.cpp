@@ -52,6 +52,7 @@
 */
 
 #include <iostream>
+#include <chrono>
 
 #include "cutlass/cutlass.h"
 
@@ -285,8 +286,6 @@ bool initialize_block(
     scope_min = -8;
   }
 
-  cutlass::reference::device::BlockFillRandomUniform(
-    block.get(), block.size(), seed, scope_max, scope_min, 0);
 
   return true;
 }
@@ -347,7 +346,7 @@ bool verify(const Options &options) {
     ref_D);
 
   // Wait for kernel to finish
-  CUDA_CHECK(cudaDeviceSynchronize());
+  syclcompat::wait_and_throw();
 
   // Check if output from CUTLASS kernel and reference kernel are equal or not
   bool passed = cutlass::reference::device::BlockCompareEqual(block_ref_D.get(), block_D.get(), block_D.size());
@@ -395,17 +394,16 @@ int run(Options &options)
   // Run profiling loop
   if (options.iterations > 0)
   {
-    GpuTimer timer;
-    timer.start();
+    auto t1 = std::chrono::high_resolution_clock::now();
     for (int iter = 0; iter < options.iterations; ++iter) {
       CUTLASS_CHECK(gemm.initialize(arguments, workspace.get()));
       CUTLASS_CHECK(gemm.run());
     }
-    timer.stop();
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::nano> ms_nano = t2 - t1;
 
     // Compute average runtime and GFLOPs.
-    float elapsed_ms = timer.elapsed_millis();
-    result.avg_runtime_ms = double(elapsed_ms) / double(options.iterations);
+    result.avg_runtime_ms = (ms_nano.count() / options.iterations) * 1e-6;
     result.gflops = options.gflops(result.avg_runtime_ms / 1000.0);
 
     std::cout << "  Problem Size: " << options.m << 'x' << options.n << 'x' << options.k << std::endl;

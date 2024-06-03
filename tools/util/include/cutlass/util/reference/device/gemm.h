@@ -111,7 +111,10 @@ void compute_gemm(
     OutputTile,
     InnerProductOp,
     ConvertOp
-  >>(    problem_size,
+  >>(
+    grid, 
+    block,   
+     problem_size,
     alpha,
     tensor_a,
     tensor_b,

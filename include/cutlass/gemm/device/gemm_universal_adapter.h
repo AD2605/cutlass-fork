@@ -381,7 +381,7 @@ public:
             
             syclcompat::experimental::launch<device_kernel<GemmKernel>>(
               syclcompat::dim3(grid.x, grid.y, grid.z), syclcompat::dim3(block.x, block.y, block.z),
-              smem_size, cluster_launch_property, kernel_params
+              static_cast<std::size_t>(smem_size), cluster_launch_property, params
             );
           #else
             launch_result = ClusterLauncher::launch(

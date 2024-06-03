@@ -49,17 +49,17 @@
 #if ((__CUDACC_VER_MAJOR__ > 11) || (__CUDACC_VER_MAJOR__ == 11 && __CUDACC_VER_MINOR__ >= 8))
   #define CUTLASS_ARCH_MMA_SM90_F64_MMA_SUPPORTED
   #if (!defined(CUTLASS_ARCH_MMA_SM90_F64_MMA_ENABLED))
-    #if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)) ||
+    #if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)) || \
         (defined(__SYCL_CUDA_ARCH__) && (__SYCL_CUDA_ARCH__ >= 900))
       #define CUTLASS_ARCH_MMA_SM90_F64_MMA_ENABLED
     #endif
   #endif
 #endif
 
-#if (__CUDACC_VER_MAJOR__ >= 12)
+#if (__CUDACC_VER_MAJOR__ >= 12) || defined(CUTLASS_ENABLE_SYCL)
   #define CUTLASS_ARCH_MMA_SM90_SUPPORTED
   #if (!defined(CUTLASS_ARCH_MMA_SM90_ENABLED))
-    #if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)) || 
+    #if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)) || \
         (defined(__SYCL_CUDA_ARCH__) && (__SYCL_CUDA_ARCH__ >= 900))
       #define CUTLASS_ARCH_MMA_SM90_ENABLED
     #endif
