@@ -56,7 +56,7 @@
 
 #include "cutlass/cutlass.h"
 
-#include "cute/tensor.hpp"
+#include <cute/tensor.hpp>
 #include "cutlass/tensor_ref.h"
 #include "cutlass/epilogue/collective/default_epilogue.hpp"
 #include "cutlass/epilogue/thread/linear_combination.h"

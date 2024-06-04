@@ -184,23 +184,23 @@ explode(
   return MMA_Op::fma(d[Id]..., a[Ia]..., b[Ib]..., c[Ic]...);
 }
 
-template <class Fn,
+template <class MMA_Op,
           class PtrA, int... Ia,
           class PtrB, int... Ib,
           class PtrC, int... Ic,
           class ParamType>
 CUTE_HOST_DEVICE constexpr
 void
-explode_with_d_scaling(Fn fn,
+explode_with_d_scaling(
         PtrA&& a, int_sequence<Ia...>,
         PtrB&& b, int_sequence<Ib...>,
         PtrC&& c, int_sequence<Ic...>,
         ParamType&& p0)
 {
-  return fn(a[Ia]..., b[Ib]..., c[Ic]..., p0);
+  return MMA_Op::fma(a[Ia]..., b[Ib]..., c[Ic]..., p0);
 }
 
-template <class Fn,
+template <class MMA_Op,
           class PtrD, int... Id,
           class PtrA, int... Ia,
           class PtrB, int... Ib,
@@ -208,14 +208,14 @@ template <class Fn,
           class ParamType>
 CUTE_HOST_DEVICE constexpr
 void
-explode_with_d_scaling(Fn fn,
+explode_with_d_scaling(
         PtrD&& d, int_sequence<Id...>,
         PtrA&& a, int_sequence<Ia...>,
         PtrB&& b, int_sequence<Ib...>,
         PtrC&& c, int_sequence<Ic...>,
         ParamType&& p0)
 {
-  return fn(d[Id]..., a[Ia]..., b[Ib]..., c[Ic]..., p0);
+  return MMA_Op::fma(d[Id]..., a[Ia]..., b[Ib]..., c[Ic]..., p0);
 }
 
 } // end namespace detail
