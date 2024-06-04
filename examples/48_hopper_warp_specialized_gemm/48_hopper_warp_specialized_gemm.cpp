@@ -269,24 +269,12 @@ struct Result
 /// Helper to initialize a block of device data
 template <class Element>
 bool initialize_block(
-  cutlass::DeviceAllocation<Element>& block,
-  uint64_t seed=2023) {
-
-  Element scope_max, scope_min;
-  int bits_input = cutlass::sizeof_bits<Element>::value;
-
-  if (bits_input == 1) {
-    scope_max = 2;
-    scope_min = 0;
-  } else if (bits_input <= 8) {
-    scope_max = 2;
-    scope_min = -2;
-  } else {
-    scope_max = 8;
-    scope_min = -8;
-  }
-
-
+  cutlass::DeviceAllocation<Element>& block) {
+  std::vector<Element> host_vector(block.size());
+  std::generate(std::begin(host_vector), std::end(host_vector), [&] {
+      return static_cast<Element>( (rand() / double(RAND_MAX)) );
+  });
+  syclcompat::memcpy(block.get(), host_vector.data(), block.size() * sizeof(Element));
   return true;
 }
 
@@ -304,9 +292,9 @@ void initialize(const Options &options) {
   block_D.reset(options.m * options.n);
   block_ref_D.reset(options.m * options.n);
 
-  initialize_block(block_A, seed + 2023);
-  initialize_block(block_B, seed + 2022);
-  initialize_block(block_C, seed + 2021);
+  initialize_block(block_A);
+  initialize_block(block_B);
+  initialize_block(block_C);
 }
 
 /// Populates a Gemm::Arguments structure from the given commandline options
