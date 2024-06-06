@@ -114,10 +114,11 @@ CUTLASS_HOST_DEVICE bool thread0() {
 }
 
 /// Returns a lane index in the warp. The threads in warp may not be convergent
+/// Returns a lane index in the warp. The threads in warp may not be convergent
 CUTLASS_DEVICE
-int canonical_lane_idx() { 
-  #if defined(__CUDA_ARCH__)
-    return threadIdx.x % NumThreadsPerWarp;
+int canonical_lane_idx() {
+  #if defined(__CUDA_ARCH__) || defined(__SYCL_CUDA_ARCH__)
+    return ThreadIdxX() % NumThreadsPerWarp;
   #else
     return 0;
   #endif
@@ -126,9 +127,9 @@ int canonical_lane_idx() {
 /// Returns a warp-uniform value indicating the canonical warp index of the calling threads.
 /// Threads within the warp must be converged.
 CUTLASS_DEVICE
-int canonical_warp_idx_sync() { 
-  #if defined(__CUDA_ARCH__)
-    return __shfl_sync(0xffffffff, threadIdx.x / NumThreadsPerWarp, 0);
+int canonical_warp_idx_sync() {
+  #if defined(__CUDA_ARCH__) || defined(__SYCL_CUDA_ARCH__)
+    return shfl_sync(0xffffffff, ThreadIdxX() / NumThreadsPerWarp, 0);
   #else
     return 0;
   #endif
@@ -137,9 +138,9 @@ int canonical_warp_idx_sync() {
 /// Returns a warp index in the CTA. The threads in warp may not be convergent
 /// As it doesn't sync the warp, it faster and allows forward progress
 CUTLASS_DEVICE
-int canonical_warp_idx() { 
-  #if defined(__CUDA_ARCH__)
-    return threadIdx.x / NumThreadsPerWarp;
+int canonical_warp_idx() {
+  #if defined(__CUDA_ARCH__) || defined(__SYCL_CUDA_ARCH__)
+    return ThreadIdxX() / NumThreadsPerWarp;
   #else
     return 0;
   #endif
@@ -149,8 +150,8 @@ int canonical_warp_idx() {
 /// Threads within the warp must be converged.
 CUTLASS_DEVICE
 int canonical_warp_group_idx() {
-  #if defined(__CUDA_ARCH__)
-    return __shfl_sync(0xffffffff, threadIdx.x / NumThreadsPerWarpGroup, 0);
+  #if defined(__CUDA_ARCH__) || defined(__SYCL_CUDA_ARCH__)
+    return shfl_sync(0xffffffff, ThreadIdxX() / NumThreadsPerWarpGroup, 0);
   #else
     return 0;
   #endif
