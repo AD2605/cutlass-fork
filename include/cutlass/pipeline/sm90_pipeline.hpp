@@ -287,7 +287,7 @@ public :
     else {
       is_signalling_thread_ = 0;
       #ifndef NDEBUG
-        asm volatile ("brkpt;\n" ::);
+        //:wqasm volatile ("brkpt;\n" ::);
       #endif
     }
 
@@ -413,12 +413,12 @@ private :
     }
     #ifndef NDEBUG
     if (params_.role == ThreadCategory::Consumer || params_.role == ThreadCategory::NonParticipant) {
-      asm volatile ("brkpt;\n" ::);
+      //:wqasm volatile ("brkpt;\n" ::);
     }
 
     // Most likely you have elected more than one leader
     if (params_.is_leader && (ThreadIdxX() % 32 != 0)) {
-      asm volatile ("brkpt;\n" ::);
+      //:asm volatile ("brkpt;\n" ::);
     }
     #endif
   }
@@ -491,7 +491,7 @@ private :
     empty_barrier_ptr_[stage].arrive(dst_blockid_, is_signalling_thread_ & (!skip));
     #ifndef NDEBUG
     if (params_.role == ThreadCategory::Producer || params_.role == ThreadCategory::NonParticipant) {
-      asm volatile ("brkpt;\n" ::);
+      //:wqasm volatile ("brkpt;\n" ::);
     }
     #endif
   }
