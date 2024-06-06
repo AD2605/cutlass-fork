@@ -60,9 +60,10 @@ struct global_load;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if (((__CUDACC_VER_MAJOR__ == 11) && (__CUDACC_VER_MINOR__ >= 4)) || \
-     (__CUDACC_VER_MAJOR__ > 11)) &&                                  \
-    defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 750)
+#if ((((__CUDACC_VER_MAJOR__ == 11) && (__CUDACC_VER_MINOR__ >= 4)) || \
+     (__CUDACC_VER_MAJOR__ > 11)) || defined(SYCL_NVIDIA_TARGET)) &&                                  \
+    (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 750)) || \
+    (defined(__SYCL_CUDA_ARCH__) && (__SYCL_CUDA_ARCH__ >= 750))
   #define CUTLASS_ENABLE_L2_PREFETCH 1
 #else
   #define CUTLASS_ENABLE_L2_PREFETCH 0
