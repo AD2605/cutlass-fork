@@ -199,7 +199,8 @@ protected:
 public:
 
   CUTLASS_DEVICE
-  ClusterBarrier() = delete;
+  ClusterBarrier() = default;
+  
 
   CUTLASS_DEVICE
   void init(uint32_t arrive_count) const {
@@ -380,7 +381,7 @@ public:
 struct ClusterTransactionBarrier : public ClusterBarrier {
 
   CUTLASS_DEVICE
-  ClusterTransactionBarrier() = delete;
+  ClusterTransactionBarrier() = default;
 
   // Performs an arrive operation + expected transaction bytes increment
   CUTLASS_DEVICE
