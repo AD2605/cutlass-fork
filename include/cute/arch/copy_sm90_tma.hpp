@@ -142,6 +142,7 @@ struct SM90_TMA_LOAD_3D
     uint64_t gmem_int_desc = reinterpret_cast<uint64_t>(desc_ptr);
     uint32_t smem_int_mbar = cast_smem_ptr_to_uint(mbar_ptr);
     uint32_t smem_int_ptr  = cast_smem_ptr_to_uint(smem_ptr);
+//    printf("crd0 %i crd1 %i crd2 %i desc_ptr %p mbar_ptr %lu smem_ptr %p\n", crd0, crd1, crd2, desc_ptr, *mbar_ptr, smem_ptr);
     asm volatile (
       "cp.async.bulk.tensor.3d.shared::cluster.global.mbarrier::complete_tx::bytes"
       " [%0], [%1, {%3, %4, %5}], [%2];"

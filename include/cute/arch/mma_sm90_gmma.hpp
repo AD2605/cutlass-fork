@@ -38,6 +38,10 @@
 #  define CUTE_ARCH_MMA_SM90A_ENABLED
 #endif
 
+#if (defined(__SYCL_CUDA_ARCH__) && (__SYCL_CUDA_ARCH__ >= 900) && (defined(__CUDA_ARCH_FEAT_SM90_ALL) || defined(SYCL_NVIDIA_TARGET)))
+#  define CUTE_ARCH_MMA_SM90A_ENABLED
+#endif
+
 namespace cute {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

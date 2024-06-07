@@ -159,7 +159,9 @@ public:
   struct deleter {
     void operator()(T* ptr) {
 #if defined(CUTLASS_ENABLE_SYCL)
-      syclcompat::free(ptr);
+      if (syclcompat::detail::dev_mgr::instance().current_device().default_queue() != nullptr) {
+        syclcompat::free(ptr);
+      }
 #else
       cudaError_t cuda_error = (cudaFree(ptr));
       if (cuda_error != cudaSuccess) {

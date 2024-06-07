@@ -39,6 +39,8 @@
 #if (defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 900 && (__CUDACC_VER_MAJOR__ >= 12))  || \
     (defined(__SYCL_CUDA_ARCH__) && (_SYCL_CUDA_ARCH__ >= 900))
 #define CUDA_BARRIER_ENABLED 1
+#elif defined(__SYCL_CUDA_ARCH__) && (__SYCL_CUDA_ARCH__ >= 900)
+#define CUDA_BARRIER_ENABLED 1
 #else
 #define CUDA_BARRIER_ENABLED 0
 #endif
