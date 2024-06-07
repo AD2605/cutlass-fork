@@ -379,7 +379,8 @@ public:
             sycl::ext::oneapi::experimental::properties cluster_launch_property
               {sycl::ext::oneapi::experimental::cluster_size(sycl::range<3>(cluster.z, cluster.y, cluster.x))};
             
-            syclcompat::experimental::launch<device_kernel<GemmKernel>>(
+            syclcompat::experimental::launch<GemmKernel::MaxThreadsPerBlock, GemmKernel::MinBlocksPerMultiprocessor, 
+                                             device_kernel<GemmKernel>>(
               syclcompat::dim3(grid.x, grid.y, grid.z), syclcompat::dim3(block.x, block.y, block.z),
               static_cast<std::size_t>(smem_size), cluster_launch_property, params
             );
