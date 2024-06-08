@@ -30,7 +30,7 @@
  **************************************************************************************************/
 #pragma once
 
-#if !defined(__CUDACC_RTC__) && !defined(CUTLASS_ENABLE_SYCL)
+#if !defined(__CUDACC_RTC__) && defined(SYCL_NVIDIA_TARGET)
 #include <cuda.h>
 #include <cinttypes>
 #endif
@@ -134,7 +134,7 @@ enum class SmemSwizzleBits : uint8_t {
   B128 = 3,
 };
 
-#if (__CUDACC_VER_MAJOR__ >= 12)
+#if (__CUDACC_VER_MAJOR__ >= 12) || defined(SYCL_NVIDIA_TARGET)
 
 #if !defined(__CUDACC_RTC__)
 /// @return The TMA descriptor datatype enum corresponding to T.
@@ -174,7 +174,7 @@ to_CUtensorMapSwizzle(SmemSwizzleBits const& t) {
 
 } // end namespace TMA
 
-#if (__CUDACC_VER_MAJOR__ >= 12) && !defined(__CUDACC_RTC__)
+#if ((__CUDACC_VER_MAJOR__ >= 12) && !defined(__CUDACC_RTC__)) || defined(SYCL_NVIDIA_TARGET)
   using TmaDescriptor = CUtensorMap;
   using Im2ColTmaDescriptor = CUtensorMap;
 #else
