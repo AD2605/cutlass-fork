@@ -53,23 +53,6 @@ static void fill_matrix(std::vector<T> &vector)
   });
 }
 
-template <typename T>
-static void vnni_matrix(
-    T* dst, const T* src,
-    int batch, int numRows, int numCols, int factor)
-{
-    for (int b = 0; b < batch; b++) {
-      for (int r = 0; r < numRows / factor; r++) {
-          for (int c = 0; c < numCols; c++) {
-              for (int k = 0; k < factor; k++) {
-                  dst[((b * (numRows / factor) + r) * numCols + c) * factor + k] =
-                      src[((b * (numRows / factor) + r) * factor + k) * numCols + c];
-              }
-          }
-      }
-    }
-}
-
 using namespace cute;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,7 +227,6 @@ struct ExampleRunner {
     fill_matrix(a);
     fill_matrix(b);
     fill_matrix(c);
-    vnni_matrix(b_vnni.data(), b.data(), L, K, N, 2);
 
     syclcompat::memcpy(block_A.get(), a.data(), a.size() * sizeof(ElementA));
     syclcompat::memcpy(block_B.get(), b.data(), b.size() * sizeof(ElementB));
@@ -351,7 +333,7 @@ int main(int argc, const char** argv)
   using LayoutD = cutlass::layout::RowMajor;
 
   using GmemTiledCopyA = XE_2D_U16x8x16x4x2_LD_N;
-  using GmemTiledCopyB = XE_2D_U16x16x16x2x1_LD_N;
+  using GmemTiledCopyB = XE_2D_U16x16x16x2x2_V;
 
   // Workgroup-level tile
   using TileShape = Shape<_32, _256, _32>;
