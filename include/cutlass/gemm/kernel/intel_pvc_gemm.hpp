@@ -181,7 +181,11 @@ public:
 
   static dim3
   get_block_shape() {
-    return dim3(MaxThreadsPerBlock, 1, 1);
+    return dim3(
+      cute::size(cute::ceil_div(cute::shape<1>(WorkgroupTileShape{}), cute::shape<1>(SubgroupTileShape{}) / SubgroupSize)),
+      cute::size(cute::ceil_div(cute::shape<0>(WorkgroupTileShape{}), cute::shape<0>(SubgroupTileShape{}))),
+      1
+    );
   }
 
   CUTLASS_DEVICE
@@ -211,8 +215,14 @@ public:
     int thread_idx = int(ThreadIdxX());
     constexpr auto workgroup_shape = WorkgroupTileShape{};                                                  // (SUB_M,SUB_N,SUB_K)
     constexpr auto subgroup_shape = SubgroupTileShape{};                                                  // (SUB_M,SUB_N,SUB_K)
-    const int m_coord = BlockIdxX() * get<0>(subgroup_shape);
-    const int n_coord = BlockIdxY() * get<1>(workgroup_shape) + thread_idx / SubgroupSize * get<1>(subgroup_shape);
+    const int m_coord = BlockIdxY() * get<0>(workgroup_shape) + (
+      get_sub_group_id() / (get<1>(workgroup_shape) / get<1>(subgroup_shape))
+    ) * get<0>(subgroup_shape);
+    
+    const int n_coord = BlockIdxX() * get<0>(workgroup_shape) + (
+      get_sub_group_id() % (get<1>(workgroup_shape) / get<1>(subgroup_shape))
+    ) * get<1>(subgroup_shape);
+
     const int l_coord = BlockIdxZ();
 
     Tensor tAi = params.mainloop.gmem_tiled_copy_a.get_pvc_tensor(

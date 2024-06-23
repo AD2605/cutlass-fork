@@ -156,6 +156,16 @@ int canonical_warp_group_idx() {
   #endif
 }
 
+#if defined(CUTLASS_ENABLE_SYCL)
+CUTLASS_DEVICE
+int get_sub_group_id() {
+  return sycl::ext::oneapi::experimental::this_nd_item<3>()                          \
+       .get_sub_group()                                                        \
+       .get_group_linear_id();
+}
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }  // namespace cutlass
