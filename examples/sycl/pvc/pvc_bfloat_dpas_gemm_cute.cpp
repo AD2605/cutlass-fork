@@ -191,10 +191,22 @@ struct ExampleRunner {
     auto epsilon = static_cast<ElementOutput>(0.1f);
     auto nonzero_floor = static_cast<ElementOutput>(0.1f);
 
-    bool passed = cutlass::reference::device::BlockCompareRelativelyEqual(
+    std::vector<float> d_host(block_D.size());
+    std::vector<float> d_ref(block_D.size());
+    syclcompat::memcpy(d_host.data(), block_D.get(), block_D,size() * sizeof(float));
+    syclcompat::memcpy(d_ref.data(), block_ref_D.get(), block_D,size() * sizeof(float));
+
+    for(int i=0; i < block_D.size(); i++) {
+      if (std::abs(d_host[i] - d_ref[i]) > 1e-3) {
+        printf("%d %f %f\n", i, d_host[i], d_ref[i]);
+      }
+      abort();
+    }
+
+    /*bool passed = cutlass::reference::device::BlockCompareRelativelyEqual(
             block_ref_D.get(), block_D.get(), block_D.size(),
             epsilon, nonzero_floor);
-
+    */
     return passed;
   }
 

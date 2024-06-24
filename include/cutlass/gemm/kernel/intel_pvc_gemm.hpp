@@ -247,8 +247,8 @@ public:
     Tensor accumulators = make_tensor<ElementAccumulator>(Shape<Int<VecC>, Int<FragsM>, Int<FragsN>>{});
     clear(accumulators);
 
-    auto k_tile_iter  = cute::make_coord_iterator(make_shape(K / get<2>(subgroup_shape)));
-    int  k_tile_count = K / get<2>(subgroup_shape);
+    int k_tile_count = cute::ceil_div(K, get<2>(subgroup_shape));
+    auto k_tile_iter = cute::make_coord_iterator(make_shape(k_tile_count));
 
     // Perform the collective scoped MMA
     CollectiveMainloop collective_mma;
