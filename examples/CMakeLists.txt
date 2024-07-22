@@ -52,7 +52,7 @@ function(cutlass_example_add_executable NAME)
     target_compile_definitions(${NAME} INTERFACE CUTLASS_ENABLE_DEBUG_PRINTS)
   endif()
 
-  if (NOT CUTLASS_ENABLE_SYCL)
+  if (SYCL_NVIDIA_TARGET)
     SET(ADD_CUDA ON)
   endif()
 
@@ -62,7 +62,7 @@ function(cutlass_example_add_executable NAME)
     CUTLASS
     cutlass_tools_util_includes
     $<$<BOOL:${CUTLASS_ENABLE_CUBLAS}>:nvidia::cublas>
-    $<$<BOOL:${ADD_CUDA}>:cuda>
+    cuda
     )
 
   target_include_directories(

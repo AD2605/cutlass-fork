@@ -377,13 +377,21 @@ public:
         if constexpr (GemmKernel::ArchTag::kMinComputeCapability == 90) {
           #if defined(CUTLASS_ENABLE_SYCL)
             sycl::ext::oneapi::experimental::properties cluster_launch_property
-              {sycl::ext::oneapi::experimental::cluster_size(sycl::range<3>(cluster.z, cluster.y, cluster.x))};
-            
-            syclcompat::experimental::launch<GemmKernel::MaxThreadsPerBlock, GemmKernel::MinBlocksPerMultiprocessor, 
-                                             device_kernel<GemmKernel>>(
-              syclcompat::dim3(grid.x, grid.y, grid.z), syclcompat::dim3(block.x, block.y, block.z),
-              static_cast<std::size_t>(smem_size), cluster_launch_property, params
-            );
+              {sycl::ext::oneapi::experimental::cuda::cluster_size(sycl::range<3>(cluster.z, cluster.y, cluster.x))};
+            auto queue = syclcompat::get_default_queue();
+            queue.submit([&](sycl::handler& cgh){
+              auto local_memory = sycl::local_accessor<char, 1>(smem_size, cgh);
+
+              cgh.parallel_for(sycl::nd_range<3>(sycl::range<3>(syclcompat::dim3(grid.x, grid.y, grid.z)), 
+              sycl::range<3>(syclcompat::dim3(block.x, block.y, block.z))), cluster_launch_property, [=](sycl::nd_item<3> it)[[intel::max_work_group_size(GemmKernel::MaxThreadsPerBlock, 1, 1)]]{
+                device_kernel<GemmKernel>(params, local_memory.get_pointer());
+              });
+            });
+            // syclcompat::experimental::launch<GemmKernel::MaxThreadsPerBlock, GemmKernel::MinBlocksPerMultiprocessor, 
+            //                                  device_kernel<GemmKernel>>(
+            //   syclcompat::dim3(grid.x, grid.y, grid.z), syclcompat::dim3(block.x, block.y, block.z),
+            //   static_cast<std::size_t>(smem_size), cluster_launch_property, params
+            // );
           #else
             launch_result = ClusterLauncher::launch(
               grid, cluster, block, smem_size, stream, kernel, kernel_params);
