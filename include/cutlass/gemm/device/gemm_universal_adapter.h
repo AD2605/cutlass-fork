@@ -382,9 +382,10 @@ public:
             queue.submit([&](sycl::handler& cgh){
               auto local_memory = sycl::local_accessor<char, 1>(smem_size, cgh);
 
-              cgh.parallel_for(sycl::nd_range<3>(sycl::range<3>(syclcompat::dim3(grid.x, grid.y, grid.z)), 
+              cgh.parallel_for(sycl::nd_range<3>(sycl::range<3>(syclcompat::dim3(grid.x, grid.y, grid.z) * syclcompat::dim3(block.x, block.y, block.z)), 
               sycl::range<3>(syclcompat::dim3(block.x, block.y, block.z))), cluster_launch_property, [=](sycl::nd_item<3> it)[[intel::max_work_group_size(GemmKernel::MaxThreadsPerBlock, 1, 1)]]{
-                device_kernel<GemmKernel>(params, local_memory.get_pointer());
+                device_kernel<GemmKernel>(params, static_cast<char *>(
+          local_memory.template get_multi_ptr<sycl::access::decorated::no>().get()));
               });
             });
             // syclcompat::experimental::launch<GemmKernel::MaxThreadsPerBlock, GemmKernel::MinBlocksPerMultiprocessor, 
