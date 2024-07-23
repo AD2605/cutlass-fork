@@ -917,7 +917,7 @@ make_tma_copy_desc(Tensor<GEngine,GLayout> const& gtensor,         // The origin
     // TMA smem swizzle type
     CUtensorMapSwizzle smem_swizzle = TMA::to_CUtensorMapSwizzle(get_tma_swizzle_bits(swizzle));
     CUresult result = cuTensorMapEncodeTiled(
-        &tma_desc,
+        reinterpret_cast<CUtensorMap*>(&tma_desc),
         tma_format,
         tma_dim,
         gmem_address,

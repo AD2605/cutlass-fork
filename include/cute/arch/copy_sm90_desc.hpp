@@ -174,7 +174,7 @@ to_CUtensorMapSwizzle(SmemSwizzleBits const& t) {
 
 } // end namespace TMA
 
-#if ((__CUDACC_VER_MAJOR__ >= 12) && !defined(__CUDACC_RTC__)) || defined(SYCL_NVIDIA_TARGET)
+#if ((__CUDACC_VER_MAJOR__ >= 12) && !defined(__CUDACC_RTC__))
   using TmaDescriptor = CUtensorMap;
   using Im2ColTmaDescriptor = CUtensorMap;
 #else
