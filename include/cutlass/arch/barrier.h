@@ -199,7 +199,7 @@ protected:
 public:
 
   CUTLASS_DEVICE
-  ClusterBarrier() = default;
+  ClusterBarrier() = delete;
   
 
   CUTLASS_DEVICE
@@ -381,7 +381,7 @@ public:
 struct ClusterTransactionBarrier : public ClusterBarrier {
 
   CUTLASS_DEVICE
-  ClusterTransactionBarrier() = default;
+  ClusterTransactionBarrier() = delete;
 
   // Performs an arrive operation + expected transaction bytes increment
   CUTLASS_DEVICE
